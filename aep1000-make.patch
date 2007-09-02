@@ -1,0 +1,85 @@
+--- Host/aeploader/make.conf.orig	2007-09-02 23:35:03.864667000 +0200
++++ Host/aeploader/make.conf	2007-09-03 00:13:02.750534022 +0200
+@@ -180,7 +180,7 @@ case "${PLATFORM}:${RELEASE}:${CMPLR}" i
+ 	#------------------------------ 
+ 	# Linux     2.4.*    gcc 
+ 	#------------------------------ 
+-	Linux:2.4.*:gcc) 
++	Linux:2.[46].*:gcc) 
+ 		cflags="-Wall -I../h  -I../Daemon/h -I../API/h  -I../../common  ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC" 
+ 		ldflags="-lpthread -L. -L../API -laep" 
+ 	;; 
+--- Host/API/make.conf.orig	2007-09-02 23:35:03.856667000 +0200
++++ Host/API/make.conf	2007-09-03 00:10:54.215209211 +0200
+@@ -123,10 +123,13 @@ ENDIAN_FLAG="-DL_ENDIAN"
+ BITS_FLAG="-D_32BIT"
+ 
+ case ${MACHINE} in 
+-	*86*)
++	*86*|alpha)
+ 		ENDIAN_FLAG="-DL_ENDIAN"
+ 		BITS_FLAG="-D_32BIT"
+ 	;;
++	ppc*|sparc*)
++		ENDIAN_FLAG="-DB_ENDIAN"
++	;;
+ 	sun4*)
+ 		ENDIAN_FLAG="-DB_ENDIAN"
+ 		ISA=`(isainfo) 2>/dev/null`
+@@ -175,7 +178,7 @@ case "${PLATFORM}:${RELEASE}:${CMPLR}" i
+ 	#------------------------------
+ 	# Linux     2.4.*    gcc
+ 	#------------------------------
+-	Linux:2.4.*:gcc)
++	Linux:2.[46].*:gcc)
+ 		TARGET="libaep.so.1"
+ 		cflags="-Wall -I../h  -I./h   -I../../common ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+ 		ldflags="-shared -O-no-undefined -Wl,-soname=${TARGET}"
+--- Host/Daemon/make.conf.orig	2007-09-02 23:35:03.856667000 +0200
++++ Host/Daemon/make.conf	2007-09-03 00:11:45.838151035 +0200
+@@ -126,10 +126,13 @@ ENDIAN_FLAG="-DL_ENDIAN"
+ BITS_FLAG="-D_32BIT"
+ 
+ case ${MACHINE} in 
+-	*86*)
++	*86*|alpha)
+ 		ENDIAN_FLAG="-DL_ENDIAN"
+ 		BITS_FLAG="-D_32BIT"
+ 	;;
++	ppc*|sparc*)
++		ENDIAN_FLAG="-DB_ENDIAN"
++	;;
+ 	sun4*)
+ 		ENDIAN_FLAG="-DB_ENDIAN"
+ 		ISA=`(isainfo) 2>/dev/null`
+@@ -178,7 +181,7 @@ case "${PLATFORM}:${RELEASE}:${CMPLR}" i
+ 	#------------------------------
+ 	# Linux     2.4.*    gcc
+ 	#------------------------------
+-	Linux:2.4.*:gcc)
++	Linux:2.[46].*:gcc)
+ 		TARGET="aepdaemon"
+ 		cflags="-Wall -I../h  -I./h   -I../../common ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+ 		ldflags="-lpthread -lnsl -lrt"
+--- Host/Test/quicktest/make.conf.orig	2007-09-02 23:35:03.856667000 +0200
++++ Host/Test/quicktest/make.conf	2007-09-03 00:12:27.744539144 +0200
+@@ -177,7 +177,7 @@ case "${PLATFORM}:${RELEASE}:${CMPLR}" i
+         #------------------------------
+         # Linux     2.4.*    gcc
+         #------------------------------
+-        Linux:2.4.*:gcc)
++        Linux:2.[46].*:gcc)
+                 cflags="-Wall -I./h -I../../h ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+                 ldflags="-lpthread -L. -L../../API -laep"
+         ;;
+--- Host/versionApp/make.conf.orig	2007-09-02 23:35:03.860667000 +0200
++++ Host/versionApp/make.conf	2007-09-03 00:13:19.363480739 +0200
+@@ -178,7 +178,7 @@ case "${PLATFORM}:${RELEASE}:${CMPLR}" i
+         #------------------------------
+         # Linux     2.4.*    gcc
+         #------------------------------
+-        Linux:2.4.*:gcc)
++        Linux:2.[46].*:gcc)
+                 cflags=" -Wall -I../h -I./h ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+                 ldflags="-lpthread -L. -L../API -laep"
+         ;;
