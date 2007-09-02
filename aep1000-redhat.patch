@@ -1,0 +1,131 @@
+--- Host/h/aep_i_defs.h	Wed Mar 13 12:53:04 2002
++++ Host/h/aep_i_defs.h	Wed Mar 13 12:53:25 2002
+@@ -285,6 +285,6 @@
+ #define AEP_4000		5	/* Older Board Types With NVM/8M sram */ 
+ 
+ 
+-#define AEP_DAEMON_SOCKET "/usr/aep/aep_socket"
++#define AEP_DAEMON_SOCKET "/var/run/aep_socket"
+ 
+ #endif
+--- Host/API/make.conf	Wed Mar 13 12:45:42 2002
++++ Host/API/make.conf	Wed Mar 13 12:56:15 2002
+@@ -169,7 +169,7 @@
+ 	Linux:2.2.*:gcc)
+ 		TARGET="libaep.so.1"
+ 		cflags="-Wall -I../h  -I./h   -I../../common ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+-		ldflags="-shared -O-no-undefined -lpthread -lnsl -lrt"
++		ldflags="-shared -O-no-undefined -Wl,-soname=${TARGET}"
+ 	;;
+ 	
+ 	#------------------------------
+@@ -178,7 +178,7 @@
+ 	Linux:2.4.*:gcc)
+ 		TARGET="libaep.so.1"
+ 		cflags="-Wall -I../h  -I./h   -I../../common ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+-		ldflags="-shared -O-no-undefined -lpthread -lnsl -lrt"
++		ldflags="-shared -O-no-undefined -Wl,-soname=${TARGET}"
+ 	;;
+ 
+ 	#------------------------------
+@@ -265,7 +265,7 @@
+ #Here's what we pass to the Compiler and Linker...
+ #==================================================
+ 
+-CFLAGS="${AEPflags} ${cflags} "
++CFLAGS="${AEPflags} ${cflags} ${RPM_OPT_FLAGS}"
+ LDFLAGS="${ldflags}" 
+ 
+ export OBJECTS
+--- Host/Daemon/make.conf	Wed Mar 13 12:44:17 2002
++++ Host/Daemon/make.conf	Wed Mar 13 12:44:26 2002
+@@ -268,7 +268,7 @@
+ #Here's what we pass to the Compiler and Linker...
+ #==================================================
+ 
+-CFLAGS="${AEPflags} ${cflags} "
++CFLAGS="${AEPflags} ${cflags} ${RPM_OPT_FLAGS}"
+ LDFLAGS="${ldflags}" 
+ 
+ export OBJECTS
+--- Host/Test/quicktest/make.conf	Wed Mar 13 12:54:05 2002
++++ Host/Test/quicktest/make.conf	Wed Mar 13 12:54:50 2002
+@@ -171,7 +171,7 @@
+         #------------------------------
+         Linux:2.2.*:gcc)
+                 cflags="-Wall -I./h -I../../h ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+-                ldflags="-lpthread -lnsl -lrt -L. -laep"
++                ldflags="-lpthread -L. -L../../API -laep"
+         ;;
+         
+         #------------------------------
+@@ -179,7 +179,7 @@
+         #------------------------------
+         Linux:2.4.*:gcc)
+                 cflags="-Wall -I./h -I../../h ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+-                ldflags="-lpthread -lnsl -lrt -L. -laep"
++                ldflags="-lpthread -L. -L../../API -laep"
+         ;;
+ 
+         #------------------------------
+--- Host/versionApp/make.conf	Wed Mar 13 13:04:29 2002
++++ Host/versionApp/make.conf	Wed Mar 13 13:04:24 2002
+@@ -172,7 +172,7 @@
+         #------------------------------
+         Linux:2.2.*:gcc)
+                 cflags="-Wall -I../h -I./h ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+-                ldflags="-lpthread -lnsl -lrt -L. -laep"
++                ldflags="-lpthread -L. -L../API -laep"
+         ;;
+         
+         #------------------------------
+@@ -180,7 +180,7 @@
+         #------------------------------
+         Linux:2.4.*:gcc)
+                 cflags=" -Wall -I../h -I./h ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
+-                ldflags="-lpthread -lnsl -lrt -L. -laep"
++                ldflags="-lpthread -L. -L../API -laep"
+         ;;
+ 
+         #------------------------------
+--- Host/aeploader/make.conf	Wed Mar 13 16:10:55 2002
++++ Host/aeploader/make.conf	Wed Mar 13 16:11:09 2002
+@@ -174,7 +174,7 @@
+ 	#------------------------------ 
+ 	Linux:2.2.*:gcc) 
+ 		cflags="-Wall -I../h  -I../Daemon/h -I../API/h  -I../../common ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC" 
+-		ldflags="-lpthread -lnsl -lrt -L. -laep" 
++		ldflags="-lpthread -L. -L../API -laep" 
+ 	;; 
+ 	 
+ 	#------------------------------ 
+@@ -182,7 +182,7 @@
+ 	#------------------------------ 
+ 	Linux:2.4.*:gcc) 
+ 		cflags="-Wall -I../h  -I../Daemon/h -I../API/h  -I../../common  ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC" 
+-		ldflags="-lpthread -lnsl -lrt -L. -laep" 
++		ldflags="-lpthread -L. -L../API -laep" 
+ 	;; 
+  
+ 	#------------------------------ 
+--- Host/API/mutex.c	Tue Apr  9 16:47:50 2002
++++ Host/API/mutex.c	Tue Apr  9 16:47:43 2002
+@@ -306,6 +306,8 @@
+ #else /* ! Win32 */
+ #error No Mutexes implemented for this architecture!
+ #endif
++
++#if 0
+ int SEM_INIT(sem_t *sem, int pshared, unsigned int value)
+ {
+ 	int err;
+@@ -325,8 +327,4 @@
+ 	{}
+ 	return 0;
+ }
+-
+-
+-
+-
+-
++#endif
