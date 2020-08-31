@@ -2,7 +2,7 @@ Summary:	Utilities for AEP1000 SSL Accelerator
 Summary(pl.UTF-8):	Narzędzia dla akceleratora AEP1000 SSL Accelerator
 Name:		aep1000
 Version:	2.1
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/System
 Source0:	aep_host_sw.tar.gz
@@ -11,6 +11,7 @@ Source1:	aeptarg.bin
 # Source1-md5:	dc6e1cadea20006fc9e3f457b23d32c5
 Patch0:		%{name}-redhat.patch
 Patch1:		%{name}-make.patch
+Patch2:		%{name}-format.patch
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -59,6 +60,7 @@ Statyczna biblioteka AEP.
 %setup -q -c
 %patch0 -p0
 %patch1 -p0
+%patch2 -p1
 
 %build
 cd Host
