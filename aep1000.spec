@@ -2,7 +2,7 @@ Summary:	Utilities for AEP1000 SSL Accelerator
 Summary(pl.UTF-8):	Narzędzia dla akceleratora AEP1000 SSL Accelerator
 Name:		aep1000
 Version:	2.1
-Release:	2
+Release:	3
 License:	BSD
 Group:		Applications/System
 Source0:	aep_host_sw.tar.gz
