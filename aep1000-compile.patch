@@ -1,0 +1,251 @@
+--- aep1000-2.1/Host/API/endian.c.orig	2026-05-11 23:28:00.295001052 +0200
++++ aep1000-2.1/Host/API/endian.c	2026-05-11 23:28:03.736740940 +0200
+@@ -44,6 +44,7 @@
+ 
+ 
+ #include "aep_i_types.h"
++#include <string.h>
+ 
+ /*Convert n longs from Big Endian format to little endian format*/
+ void BEndToLEnd(AEP_U8 *buf, unsigned longs)
+--- aep1000-2.1/Host/Daemon/endian.c.orig	2026-05-11 23:28:00.296784527 +0200
++++ aep1000-2.1/Host/Daemon/endian.c	2026-05-11 23:28:06.508975916 +0200
+@@ -44,6 +44,7 @@
+ 
+ 
+ #include "aep_i_types.h"
++#include <string.h>
+ 
+ /*Convert n longs from Big Endian format to little endian format*/
+ void BEndToLEnd(AEP_U8 *buf, unsigned longs)
+--- aep1000-2.1/Host/API/h/aeptrace_config.h.orig	2026-05-11 23:28:00.298467539 +0200
++++ aep1000-2.1/Host/API/h/aeptrace_config.h	2026-05-11 23:28:10.666100496 +0200
+@@ -109,7 +109,7 @@
+ #define RVWidth						20
+ 
+ /* Function Prototypes */
+-void setTraceConfigValues();
++void setTraceConfigValues(int sig);
+ int initTraceConfigItems();
+ 
+ #endif
+--- aep1000-2.1/Host/Daemon/h/aeptrace_config.h.orig	2026-05-11 23:28:00.300095133 +0200
++++ aep1000-2.1/Host/Daemon/h/aeptrace_config.h	2026-05-11 23:28:10.738783422 +0200
+@@ -109,7 +109,7 @@
+ #define RVWidth						20
+ 
+ /* Function Prototypes */
+-void setTraceConfigValues();
++void setTraceConfigValues(int sig);
+ int initTraceConfigItems();
+ 
+ #endif
+--- aep1000-2.1/Host/API/aeptrace_config.c.orig	2026-05-11 23:28:00.301716258 +0200
++++ aep1000-2.1/Host/API/aeptrace_config.c	2026-05-11 23:28:14.387580995 +0200
+@@ -67,7 +67,7 @@
+ 	This function reads the tracing options required by the user from aeplog.conf and populates 
+ 	the global array of structures with these values 
+ ******************************************************************************************************/
+-void setTraceConfigValues()
++void setTraceConfigValues(int sig)
+ {	
+ 
+ 	FILE *configFile;
+--- aep1000-2.1/Host/Daemon/aeptrace_config.c.orig	2026-05-11 23:28:00.303652965 +0200
++++ aep1000-2.1/Host/Daemon/aeptrace_config.c	2026-05-11 23:28:14.460637405 +0200
+@@ -67,7 +67,7 @@
+ 	This function reads the tracing options required by the user from aeplog.conf and populates 
+ 	the global array of structures with these values 
+ ******************************************************************************************************/
+-void setTraceConfigValues()
++void setTraceConfigValues(int sig)
+ {	
+ 
+ 	FILE *configFile;
+--- aep1000-2.1/Host/API/aeptrace.c.orig	2026-05-11 23:28:00.305405774 +0200
++++ aep1000-2.1/Host/API/aeptrace.c	2026-05-11 23:28:25.632304537 +0200
+@@ -486,7 +486,7 @@
+ 	rv = initTraceConfigItems();
+ 
+ 	/* Parse config file and set configurable options  */
+-	setTraceConfigValues(&setTraceRV);
++	setTraceConfigValues(0);
+ 	
+ 	if (setTraceRV != AEP_R_OK)
+ 	{
+--- aep1000-2.1/Host/Daemon/aeptrace.c.orig	2026-05-11 23:28:00.306952354 +0200
++++ aep1000-2.1/Host/Daemon/aeptrace.c	2026-05-11 23:28:25.707882377 +0200
+@@ -486,7 +486,7 @@
+ 	rv = initTraceConfigItems();
+ 
+ 	/* Parse config file and set configurable options  */
+-	setTraceConfigValues(&setTraceRV);
++	setTraceConfigValues(0);
+ 	
+ 	if (setTraceRV != AEP_R_OK)
+ 	{
+--- aep1000-2.1/Host/API/init.c.orig	2026-05-11 23:28:00.308668142 +0200
++++ aep1000-2.1/Host/API/init.c	2026-05-11 23:28:31.709425146 +0200
+@@ -431,9 +431,9 @@
+ 	Outputs	:	None
+ */
+ AEP_SLIB_CALLING_CONVENTION AEP_RV AEP_SetBNCallBacks(
+- AEP_RV		(*GetBigNumSizeFunc)(),
+- AEP_RV		(*MakeAEPBigNumFunc)(),
+- AEP_RV		(*ConvertAEPBigNumFunc)()
++ AEP_RV		(*GetBigNumSizeFunc)(void *, AEP_U32 *),
++ AEP_RV		(*MakeAEPBigNumFunc)(void *, AEP_U32, unsigned char *),
++ AEP_RV		(*ConvertAEPBigNumFunc)(void *, AEP_U32, unsigned char *)
+ )
+ {
+ 	AEP_RV rv = AEP_R_OK;
+--- aep1000-2.1/Host/h/aep_api.h.orig	2026-05-11 23:28:00.310263652 +0200
++++ aep1000-2.1/Host/h/aep_api.h	2026-05-11 23:28:36.484358148 +0200
+@@ -104,9 +104,9 @@
+ 	Outputs	:	None
+ */
+ AEP_SLIB_CALLING_CONVENTION AEP_RV AEP_SetBNCallBacks(
+-		AEP_RV (*GetBigNumSizeFunc)(),
+-		AEP_RV (*MakeAEPBigNumFunc)(),
+-		AEP_RV (*ConverAEPBigNumFunc)()
++		AEP_RV (*GetBigNumSizeFunc)(void *, AEP_U32 *),
++		AEP_RV (*MakeAEPBigNumFunc)(void *, AEP_U32, unsigned char *),
++		AEP_RV (*ConverAEPBigNumFunc)(void *, AEP_U32, unsigned char *)
+ 	);
+ 
+ 
+--- aep1000-2.1/Host/Daemon/h/config_hndlr.h.orig	2026-05-11 23:30:03.175914112 +0200
++++ aep1000-2.1/Host/Daemon/h/config_hndlr.h	2026-05-11 23:30:09.389195127 +0200
+@@ -47,7 +47,7 @@
+ AEP_RV PresetConfigValues (); 
+ 
+ /* SIGHUP signal handling function  */
+-void SetConfigValues (); 
++void SetConfigValues (int sig); 
+ 
+ 
+ 
+--- aep1000-2.1/Host/Daemon/h/keyman_hndlr.h.orig	2026-05-11 23:30:03.177743580 +0200
++++ aep1000-2.1/Host/Daemon/h/keyman_hndlr.h	2026-05-11 23:30:09.389286982 +0200
+@@ -41,4 +41,4 @@
+ * terms of that license.                                              *
+ *                                                                     *
+ **********************************************************************/
+-void *ptrKeyManHndlr();
++void *ptrKeyManHndlr(void *arg);
+--- aep1000-2.1/Host/Daemon/h/buf_hndlr.h.orig	2026-05-11 23:30:03.179419403 +0200
++++ aep1000-2.1/Host/Daemon/h/buf_hndlr.h	2026-05-11 23:30:09.389380295 +0200
+@@ -43,12 +43,12 @@
+ **********************************************************************/
+ 
+ /*Function definition for the response reader thread*/
+-void *ptrASICBuffHndlr();
++void *ptrASICBuffHndlr(void *arg);
+ 
+ /*Function definition for the context handler thread*/
+ void *ptrDESBuffHndlr();
+ 
+ /*Function definition for the timed out hndlr thread*/
+-void *ptrSABuffHndlr();
++void *ptrSABuffHndlr(void *arg);
+ 
+ 
+--- aep1000-2.1/Host/Daemon/h/response_hndlr.h.orig	2026-05-11 23:30:03.181048261 +0200
++++ aep1000-2.1/Host/Daemon/h/response_hndlr.h	2026-05-11 23:30:09.389449693 +0200
+@@ -44,4 +44,4 @@
+ 
+ 
+ /*Function definition for the response reader thread*/
+-void *ptrResponseHndlr();
++void *ptrResponseHndlr(void *arg);
+--- aep1000-2.1/Host/Daemon/h/timeout_hndlr.h.orig	2026-05-11 23:30:03.182825942 +0200
++++ aep1000-2.1/Host/Daemon/h/timeout_hndlr.h	2026-05-11 23:30:09.389514693 +0200
+@@ -42,4 +42,4 @@
+ *                                                                     *
+ **********************************************************************/
+ /*Function definition for the Timed Out handler*/
+-void *ptrTimedOutHndlr();
++void *ptrTimedOutHndlr(void *arg);
+--- aep1000-2.1/Host/Daemon/config_hndlr.c.orig	2026-05-11 23:30:03.184537554 +0200
++++ aep1000-2.1/Host/Daemon/config_hndlr.c	2026-05-11 23:30:14.919775693 +0200
+@@ -1021,7 +1021,7 @@
+ 	Outputs	: Void
+ ****************************************************************/
+ 
+-void SetConfigValues () 
++void SetConfigValues (int sig)
+ {
+ 
+ 	int 			i;
+--- aep1000-2.1/Host/Daemon/keyman_hndlr.c.orig	2026-05-11 23:30:03.187892134 +0200
++++ aep1000-2.1/Host/Daemon/keyman_hndlr.c	2026-05-11 23:30:14.919901931 +0200
+@@ -95,7 +95,7 @@
+ /*Memory mapped addresses*/
+ extern AEP_U8 *config_base_addr;
+ 
+-void *ptrKeyManHndlr()
++void *ptrKeyManHndlr(void *arg)
+ {
+ 	AEP_RV rv= AEP_R_OK;
+ 	AEP_MSG_HDR message_hdr;
+--- aep1000-2.1/Host/Daemon/buf_hndlr.c.orig	2026-05-11 23:30:03.189553683 +0200
++++ aep1000-2.1/Host/Daemon/buf_hndlr.c	2026-05-11 23:30:14.920029428 +0200
+@@ -104,7 +104,7 @@
+ /*	ptrASICBuffHndlr
+ 	This function defines the thread that handles the emptying of the ASIC request buffer
+ */
+-void *ptrASICBuffHndlr()
++void *ptrASICBuffHndlr(void *arg)
+ {
+ 	int rv, bad_write;
+ 	
+@@ -414,7 +414,7 @@
+ /*	ptrSABuffHndlr
+ 	This function defines the thread that handles the emptying of the SA request buffer
+ */
+-void *ptrSABuffHndlr()
++void *ptrSABuffHndlr(void *arg)
+ {
+ 	int rv, bad_write;
+ 	
+--- aep1000-2.1/Host/Daemon/response_hndlr.c.orig	2026-05-11 23:30:03.191170926 +0200
++++ aep1000-2.1/Host/Daemon/response_hndlr.c	2026-05-11 23:30:14.920122056 +0200
+@@ -84,7 +84,7 @@
+ 
+ 
+ 
+-void *ptrResponseHndlr()
++void *ptrResponseHndlr(void *arg)
+ {
+ 	AEP_I_RESPONSE_DATA_PTR pResponse;
+ 	AEP_MSG_HDR_PTR		response_header;
+--- aep1000-2.1/Host/Daemon/timeout_hndlr.c.orig	2026-05-11 23:30:03.193221639 +0200
++++ aep1000-2.1/Host/Daemon/timeout_hndlr.c	2026-05-11 23:30:14.920208509 +0200
+@@ -80,7 +80,7 @@
+ /*This thread traverses the response hash table at intervals and checks to see if any
+ 	of the response items' time stamps are stale*/
+ 
+-void *ptrTimedOutHndlr()
++void *ptrTimedOutHndlr(void *arg)
+ {
+   /*Used to hold the current response item*/
+ 	AEP_I_RESPONSE_DATA_PTR pResponse;
+--- aep1000-2.1/Host/Test/quicktest/h/randtest.h.orig	2026-05-11 23:30:54.297173943 +0200
++++ aep1000-2.1/Host/Test/quicktest/h/randtest.h	2026-05-11 23:30:54.364947056 +0200
+@@ -44,4 +44,4 @@
+ 
+ 
+ /*FIPS randomness test (Code from OpenSSL)*/
+-int randTest();
++int randTest(unsigned char *buf);
+--- aep1000-2.1/Host/Test/quicktest/h/aeptest.h.orig	2026-05-11 23:30:54.298838006 +0200
++++ aep1000-2.1/Host/Test/quicktest/h/aeptest.h	2026-05-11 23:30:54.436031384 +0200
+@@ -87,7 +87,7 @@
+ /*************Function prototypes*************/
+ 
+ /*Function definition for the Mod Exp thread*/
+-static void *ptrModExpThread();
++static void *ptrModExpThread(void *arg);
+ static void count_exits();
+ 
+ /*Callback functions*/

@@ -5,7 +5,7 @@
  	# Linux     2.4.*    gcc 
  	#------------------------------ 
 -	Linux:2.4.*:gcc) 
-+	Linux:2.[46].*:gcc|Linux:[345].*:gcc)
++	Linux:2.[46].*:gcc|Linux:[3-9].*:gcc)
  		cflags="-Wall -I../h  -I../Daemon/h -I../API/h  -I../../common  ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC" 
  		ldflags="-lpthread -L. -L../API -laep" 
  	;; 
@@ -31,7 +31,7 @@
  	# Linux     2.4.*    gcc
  	#------------------------------
 -	Linux:2.4.*:gcc)
-+	Linux:2.[46].*:gcc|Linux:[345].*:gcc)
++	Linux:2.[46].*:gcc|Linux:[3-9].*:gcc)
  		TARGET="libaep.so.1"
  		cflags="-Wall -I../h  -I./h   -I../../common ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
  		ldflags="-shared -O-no-undefined -Wl,-soname=${TARGET}"
@@ -57,7 +57,7 @@
  	# Linux     2.4.*    gcc
  	#------------------------------
 -	Linux:2.4.*:gcc)
-+	Linux:2.[46].*:gcc|Linux:[345].*:gcc)
++	Linux:2.[46].*:gcc|Linux:[3-9].*:gcc)
  		TARGET="aepdaemon"
  		cflags="-Wall -I../h  -I./h   -I../../common ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
 -		ldflags="-lpthread -lnsl -lrt"
@@ -72,7 +72,7 @@
          # Linux     2.4.*    gcc
          #------------------------------
 -        Linux:2.4.*:gcc)
-+        Linux:2.[46].*:gcc|Linux:[345].*:gcc)
++        Linux:2.[46].*:gcc|Linux:[3-9].*:gcc)
                  cflags="-Wall -I./h -I../../h ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
                  ldflags="-lpthread -L. -L../../API -laep"
          ;;
@@ -83,7 +83,7 @@
          # Linux     2.4.*    gcc
          #------------------------------
 -        Linux:2.4.*:gcc)
-+        Linux:2.[46].*:gcc|Linux:[345].*:gcc)
++        Linux:2.[46].*:gcc|Linux:[3-9].*:gcc)
                  cflags=" -Wall -I../h -I./h ${ENDIAN_FLAG} ${BITS_FLAG} -D_REENTRANT -fPIC"
                  ldflags="-lpthread -L. -L../API -laep"
          ;;
